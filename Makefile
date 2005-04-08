@@ -64,7 +64,7 @@ clean:
 
 %.bz2:
 	@echo
-	@echo Obtain the file $@ from a GNU mirror site and copy it to this directory.
+	@echo Obtain the file $@ from a GNU repository or (gcc.gnu.org) mirror and copy it to this directory.
 	@echo
 	@exit 2
 
