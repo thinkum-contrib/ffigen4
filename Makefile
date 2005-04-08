@@ -4,8 +4,10 @@ ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
 
 ifeq ($(OS),Linux)
 PLATFORM = linuxppc
-CONFIGARGS = --target=ppc64-unknown-linux --host=ppc64-unknown-linux --with-cpu=default32 --enable-biarch
-COPY_OBJC_HEADERS = NO
+CONFIGTARGET = ppc64-unknown-linux
+CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch
+MAKE_FUNKY_LINK = YES
+COPY_OBJC_HEADERS = YES
 endif
 
 ifeq ($(OS),Darwin)
@@ -26,7 +28,12 @@ compile: patch
 	mkdir build
 	(cd build ; ../gcc-$(GCC_VERSION)/configure --enable-languages=objc $(CONFIGARGS) )
 ifeq ($(MAKE_FUNKY_LINK),YES)
+ifeq ($(OS),Darwin)
 	(cd build ; ln -s . build-`../gcc-$(GCC_VERSION)/config.guess`)
+endif
+ifeq ($(OS),Linux)
+	(cd build ; ln -s . build-$(CONFIGTARGET))
+endif
 endif
 	(cd build ; make maybe-configure-libiberty maybe-configure-gcc maybe-configure-libcpp)
 	(cd build/libiberty ; make)
@@ -66,5 +73,5 @@ clean:
 	@exit 2
 
 extract: $(ARCHIVES) clean
-	tar foxj gcc-core-$(GCC_VERSION).tar.bz2
-	tar foxj gcc-objc-$(GCC_VERSION).tar.bz2
+	tar fxj gcc-core-$(GCC_VERSION).tar.bz2
+	tar fxj gcc-objc-$(GCC_VERSION).tar.bz2
