@@ -2,9 +2,6 @@ OS = $(shell uname -s)
 GCC_VERSION = 4.0-20050326
 ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
 
-# On LinuxPPC, we want to generate a 32/64-bit compiler (that defaults
-# to 32-bit.)  We need to copy some compiler-specific headers to a
-# directory that ffigen can find at runtime.
 ifeq ($(OS),Linux)
 PLATFORM = linuxppc
 CONFIGARGS = --target=ppc64-unknown-linux --host=ppc64-unknown-linux --with-cpu=default32 --enable-biarch
