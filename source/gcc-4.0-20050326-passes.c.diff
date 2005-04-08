@@ -1,0 +1,16 @@
+--- passes.c.orig	2005-04-07 06:30:34.000000000 -0600
++++ passes.c	2005-04-07 06:33:53.000000000 -0600
+@@ -251,10 +251,12 @@
+       debug_hooks->type_decl (decl, !top_level);
+       timevar_pop (TV_SYMOUT);
+     }
+-
+   /* Let cgraph know about the existance of variables.  */
+   if (TREE_CODE (decl) == VAR_DECL && !DECL_EXTERNAL (decl))
+     cgraph_varpool_node (decl);
++
++  if (flag_syntax_only) 
++    ffi_rest_of_decl_compilation (decl, top_level, at_end);
+ }
+ 
+ /* Called after finishing a record, union or enumeral type.  */

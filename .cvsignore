@@ -1,0 +1,7 @@
+*.gz
+*.bz2
+bin*
+build*
+ffigen*
+gcc*
+*.txt

@@ -1,0 +1,33 @@
+--- toplev.c.orig	2005-04-07 06:27:43.000000000 -0600
++++ toplev.c	2005-04-07 06:29:45.000000000 -0600
+@@ -988,6 +988,8 @@
+   init_cgraph ();
+   init_final (main_input_filename);
+   coverage_init (aux_base_name);
++  if (flag_syntax_only) 
++    ffi_init (asm_out_file, main_input_filename);
+ 
+   timevar_push (TV_PARSE);
+ 
+@@ -1996,6 +1998,8 @@
+   input_filename = "<built-in>";
+   input_line = 0;
+ #endif
++  if (flag_syntax_only)
++    ffi_early_init ();
+   if (lang_hooks.init () == 0)
+     return 0;
+   input_location = save_loc;
+@@ -2088,6 +2092,12 @@
+ 
+   process_options ();
+ 
++  
++  if (no_backend && flag_syntax_only) {
++    errorcount++;
++  }
++
++
+   /* Don't do any more if an error has already occurred.  */
+   if (!errorcount)
+     {
