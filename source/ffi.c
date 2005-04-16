@@ -237,7 +237,7 @@ ffi_maybe_synthesize_integer_type (tree type, struct ffi_typeinfo *info)
       switch (nbytes) 
         {
         case 1:
-          info->name = is_unsigned ? "unsigned-char" : "signed_char";
+          info->name = is_unsigned ? "unsigned-char" : "signed-char";
           info->status = FFI_TYPE_PRIMITIVE;
           break;
         case 2:
@@ -770,47 +770,6 @@ ffi_define_builtin_type (tree type)
         
         
 
-static void
-ffi_define_builtin_types (tree syms)
-{
-  tree s;
-
-  for (s = syms; s; s = TREE_CHAIN (s))
-    if (TREE_CODE (s) == TYPE_DECL)
-      {
-        tree type = TREE_TYPE (s);
-        if (TYPE_NAME (type)
-            && TREE_CODE (type) != POINTER_TYPE
-            && TREE_CODE (type) != ARRAY_TYPE
-            && TREE_CODE (TYPE_NAME (type)) == TYPE_DECL
-            && TYPE_SIZE (type) != NULL_TREE
-            && ! TREE_ASM_WRITTEN (TYPE_NAME (type)))
-          {
-            /*
-              fprintf (stderr, "Defining primitive type:\n");
-              debug_tree (type);
-              fprintf (stderr, " -- primitive type name = \n");
-              debug_tree (TYPE_NAME (type));
-            */
-            ffi_define_type (TYPE_NAME (type), FFI_TYPE_PRIMITIVE);
-          }
-      }
-  for (s = syms; s; s = TREE_CHAIN (s))
-    if (TREE_CODE (s) == TYPE_DECL)
-      {
-        tree type = TREE_TYPE (s);
-        if (TYPE_NAME (type)
-            && (TREE_CODE (type) == POINTER_TYPE ||
-                TREE_CODE (type) == ARRAY_TYPE)
-            && TREE_CODE (TYPE_NAME (type)) == TYPE_DECL
-            && TYPE_SIZE (type) != NULL_TREE
-            && ! TREE_ASM_WRITTEN (TYPE_NAME (type)))
-          {
-            ffi_create_type_info (type);
-            /* ffi_define_type (TYPE_NAME (type), FFI_TYPE_TYPEDEF); */
-          }
-      }
-}
 
 static void
 ffi_define_variable (tree decl)
