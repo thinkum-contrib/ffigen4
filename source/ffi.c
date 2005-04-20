@@ -1,5 +1,5 @@
 /* ffi.c - generate .ffi file from .h file
-   Copyright (C) 2001, Clozure Associates.
+   Copyright (C) 2001, 2005 Clozure Associates.
    Copyright (C) 2004, Helmut Eller
 
 This file is part of GNU CC (or, more accurately, part of a work
@@ -54,6 +54,7 @@ struct ffi_input_file {
 
 struct ffi_input_file *current_ffi_input_file = NULL;
 char *ffi_current_source_file;
+char *ffi_primary_source_file;
 
 static int ffi_indent_count = 1;
 
@@ -347,8 +348,8 @@ ffi_create_type_info (tree type)
 	  }
 	if (! info->name)
 	  {
-	    char buf[16];
-	    sprintf(buf, "%d", info->type_number);
+	    char buf[2048];
+	    sprintf(buf, "%d_%s", info->type_number, ffi_primary_source_file);
 	    info->name = (char *) xstrdup (buf);
 	  }
 	if (TREE_CODE (type) == ENUMERAL_TYPE)
@@ -1156,6 +1157,7 @@ ffi_init (FILE *ffi_file, char *input_file_name)
 
   ffifile = ffi_file ? ffi_file : stderr;
   ffi_current_source_file = (char *) xstrdup (input_file_name);
+  ffi_primary_source_file = ffi_current_source_file;
 
   for (i = 0; i < itk_none; i++) 
     {
