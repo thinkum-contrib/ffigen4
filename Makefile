@@ -5,7 +5,7 @@ ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
 ifeq ($(OS),Linux)
 PLATFORM = linuxppc
 CONFIGTARGET = ppc64-unknown-linux
-CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch
+CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch --enable-threads=posix
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
 endif
