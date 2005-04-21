@@ -623,42 +623,45 @@ ffi_emit_enum_idents (tree val)
 */
 
 static void
-ffi_emit_field_list (tree field)
+ffi_emit_field_list (tree field, int public_only)
 {
   int indentp = 0;
   ffi_indent ();
   fprintf (ffifile, "(");
   for (; field; field = TREE_CHAIN (field), indentp = 1)
     {
-      /*
-	fprintf (stderr, "\nEmit field:\n");
-	debug_tree (field);
-      */
-      if (indentp)
-	ffi_indent ();
-      if (DECL_BIT_FIELD (field))
-	{
-	  tree type = DECL_BIT_FIELD_TYPE (field);
-	  int bit_position = int_bit_position (field); 
-	  int size_in_bits = tree_low_cst (DECL_SIZE (field), 1);
-	  fprintf (ffifile, "(\"%s\" (bitfield ", ffi_decl_name (field));
-	  emit_ffi_type_reference (type);
-	  fprintf (ffifile, " %d %d))", bit_position, size_in_bits);
-	}
-      else
-	{
-	  tree type = TREE_TYPE (field);
-	  int bit_position = int_bit_position (field); 
-	  tree size = TYPE_SIZE (type);
-	  int type_size = (size 
-			   ? tree_low_cst (size, 1) 
-			   : 0); /* flex array */
-	  fprintf (ffifile, "(\"%s\" (field ", ffi_decl_name (field));
-	  emit_ffi_type_reference (type);
-	  fprintf (ffifile, " %d %d))", bit_position >> 3, type_size >> 3);
-	}
-      if (indentp)
-	ffi_unindent (1);
+      if (!public_only || (!TREE_PRIVATE (field)))
+        {
+          /*
+            fprintf (stderr, "\nEmit field:\n");
+            debug_tree (field);
+          */
+          if (indentp)
+            ffi_indent ();
+          if (DECL_BIT_FIELD (field))
+            {
+              tree type = DECL_BIT_FIELD_TYPE (field);
+              int bit_position = int_bit_position (field); 
+              int size_in_bits = tree_low_cst (DECL_SIZE (field), 1);
+              fprintf (ffifile, "(\"%s\" (bitfield ", ffi_decl_name (field));
+              emit_ffi_type_reference (type);
+              fprintf (ffifile, " %d %d))", bit_position, size_in_bits);
+            }
+          else
+            {
+              tree type = TREE_TYPE (field);
+              int bit_position = int_bit_position (field); 
+              tree size = TYPE_SIZE (type);
+              int type_size = (size 
+                               ? tree_low_cst (size, 1) 
+                               : 0); /* flex array */
+              fprintf (ffifile, "(\"%s\" (field ", ffi_decl_name (field));
+              emit_ffi_type_reference (type);
+              fprintf (ffifile, " %d %d))", bit_position >> 3, type_size >> 3);
+            }
+          if (indentp)
+            ffi_unindent (1);
+        }
     }
   fprintf (ffifile, ")");
   ffi_unindent (1);
@@ -678,7 +681,7 @@ ffi_emit_type (struct ffi_typeinfo *info, tree type)
       ffi_indent ();
       fprintf (ffifile, "\"%s\"", info->name);
       ffi_unindent (1);
-      ffi_emit_field_list (TYPE_FIELDS (type));
+      ffi_emit_field_list (TYPE_FIELDS (type), 0);
       fprintf (ffifile, ")\n");
       break;
 
@@ -687,7 +690,7 @@ ffi_emit_type (struct ffi_typeinfo *info, tree type)
       ffi_indent ();
       fprintf (ffifile, "\"%s\"", info->name);
       ffi_unindent (1);
-      ffi_emit_field_list (TYPE_FIELDS (type));
+      ffi_emit_field_list (TYPE_FIELDS (type), 0);
       fprintf (ffifile, ")\n");
       break;
      
@@ -849,7 +852,7 @@ ffi_define_objc_class (tree node)
   emit_ffi_type_reference (static_template);
   fprintf (ffifile, ")");
   ffi_unindent (1);
-  ffi_emit_field_list (CLASS_IVARS (node));
+  ffi_emit_field_list (CLASS_IVARS (node), 1);
   fprintf (ffifile, ")\n");
 }
 
