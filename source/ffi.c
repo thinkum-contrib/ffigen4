@@ -822,7 +822,11 @@ ffi_objc_method_parm_type (tree type)
   type = TREE_VALUE (TREE_TYPE (type));
   if (TREE_CODE (type) == TYPE_DECL)
     type = TREE_TYPE (type);
+#if 0
   return TYPE_MAIN_VARIANT (type);
+#else
+  return type;
+#endif
 }
 
     
@@ -830,7 +834,9 @@ static void
 ffi_define_objc_class (tree node)
 {
   const char *super_name = NULL;
-  tree static_template = CLASS_STATIC_TEMPLATE (node);
+  tree 
+    pl = CLASS_PROTOCOL_LIST (node),
+    p;
 
   if (CLASS_SUPER_NAME (node))		
     super_name = IDENTIFIER_POINTER (CLASS_SUPER_NAME (node));
@@ -841,15 +847,21 @@ ffi_define_objc_class (tree node)
   fprintf (ffifile, "\"%s\"", IDENTIFIER_POINTER (CLASS_NAME (node)));
   ffi_unindent (1); 
   ffi_indent ();
-  fprintf (ffifile, "(superclass ");
+  fprintf (ffifile, "(");
   if (super_name)
     fprintf (ffifile, "\"%s\")", super_name);
   else
     fprintf (ffifile, "void)");
   ffi_unindent (1);
   ffi_indent ();
-  fprintf (ffifile, "(template ");
-  emit_ffi_type_reference (static_template);
+  fprintf (ffifile, "(");
+  for (pl = CLASS_PROTOCOL_LIST (node); pl; pl = TREE_CHAIN (pl))
+    {
+      p = TREE_VALUE (pl);
+      fprintf(ffifile, "\"%s\"", IDENTIFIER_POINTER (PROTOCOL_NAME (p)));
+      if (TREE_CHAIN (pl))
+        fprintf (ffifile, " ");
+    }
   fprintf (ffifile, ")");
   ffi_unindent (1);
   ffi_emit_field_list (CLASS_IVARS (node), 1);
@@ -886,11 +898,12 @@ ffi_define_objc_method (const char *method_kind, tree m, tree c, const char *cat
     emit_ffi_type_reference (ffi_objc_method_parm_type (param));
   }
   if (METHOD_ADD_ARGS (m))
-    {
-      if (i) 
-        fprintf (ffifile, " ");
-      fprintf (ffifile, "(void ())");
-    }
+    if (TREE_PUBLIC (METHOD_ADD_ARGS (m)))
+      {
+        if (i) 
+          fprintf (ffifile, " ");
+        fprintf (ffifile, "(void ())");
+      }
   fprintf (ffifile, ")");
   ffi_unindent (1);
   ffi_indent ();
@@ -938,6 +951,23 @@ ffi_rest_of_objc_category_compilation (tree category)
     ffi_define_objc_instance_method (n, category, category_name);
 }
 
+void
+ffi_rest_of_objc_protocol_compilation (tree p)
+{
+  tree n;
+  char *category_name;
+  
+  for (n = PROTOCOL_CLS_METHODS (p); n; n = TREE_CHAIN (n))
+    ffi_define_objc_method ("objc-protocol-class-method", 
+                            n, 
+                            p, 
+                            category_name);
+  for (n = PROTOCOL_NST_METHODS (p); n; n = TREE_CHAIN (n))
+    ffi_define_objc_method ("objc-protocol-instance-method", 
+                            n, 
+                            p, 
+                            category_name);
+}
 
 void
 ffi_rest_of_decl_compilation (tree decl, 
