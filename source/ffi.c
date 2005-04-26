@@ -32,6 +32,7 @@ Boston, MA 02111-1307, USA.  */
 #include "debug.h"
 #include "diagnostic.h"         /* for errorcount */
 #include "objc/objc-act.h"
+#include "ffi-version.h"
 
 /* Prototypes */
 
@@ -41,7 +42,13 @@ void ffi_early_init (void);
 void ffi_init (FILE *_file, char *);
 void ffi_rest_of_objc_class_compilation (tree);
 void ffi_rest_of_objc_category_compilation (tree);
+void print_ffi_version(FILE *, char *);
 
+void
+print_ffi_version(FILE *out, char *indent)
+{
+  fprintf (out, "%s%sFFIGEN version %s\n", indent, *indent != 0 ? " " : "", ffi_version);
+}
 
 FILE *ffifile;
 
