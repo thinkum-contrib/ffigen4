@@ -1,7 +1,7 @@
 while [ $# -gt 1 ]
 do 
     case ${1} in
-      -pthread)
+      -pthread*)
         CFLAGS="${CFLAGS} -D_REENTRANT"
         shift
         ;;
