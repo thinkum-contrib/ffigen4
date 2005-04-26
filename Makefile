@@ -1,4 +1,6 @@
 OS = $(shell uname -s)
+NOW = $(shell date -u "+%F-%H-%M-%S")
+
 GCC_VERSION = 4.0-20050326
 ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
 
@@ -21,7 +23,7 @@ endif
 
 
 all: package
-	m4 -DPLATFORM=$(PLATFORM) -DGCC_VERSION=$(GCC_VERSION) source/INSTALL-$(PLATFORM).m4 > INSTALL-FFIGEN-$(PLATFORM)-gcc-$(GCC_VERSION).txt
+	m4 -DPLATFORM=$(PLATFORM) -DGCC_VERSION=$(GCC_VERSION)-$(NOW) source/INSTALL-$(PLATFORM).m4 > INSTALL-FFIGEN-$(PLATFORM)-gcc-$(GCC_VERSION)-$(NOW).txt
 
 
 compile: patch
@@ -43,6 +45,7 @@ endif
 
 patch: extract
 	ln -sf `pwd`/source/ffi.c gcc-$(GCC_VERSION)/gcc
+	printf "char *ffi_version = \42%s\42;\n" "$(NOW)" > gcc-$(GCC_VERSION)/gcc/ffi-version.h
 	for f in source/gcc-$(GCC_VERSION)*.diff ; do \
 	  (cd gcc-$(GCC_VERSION)/gcc; patch -p0 <../../$$f); \
 	done
@@ -61,10 +64,10 @@ endif
 	mkdir ffigen/bin
 	cp -p build/gcc/cc1obj ffigen/bin/ffigen
 	strip ffigen/bin/ffigen
-	tar cfz ffigen-bin-$(PLATFORM)-gcc-$(GCC_VERSION).tar.gz bin ffigen
+	tar cfz ffigen-bin-$(PLATFORM)-gcc-$(GCC_VERSION)-$(NOW).tar.gz bin ffigen
 
 clean:
-	rm -rf gcc-$(GCC_VERSION) ffigen build bin ffigen*tar.gz INSTALL-FFIGEN-$(PLATFORM)-gcc-$(GCC_VERSION).txt
+	rm -rf gcc-$(GCC_VERSION) ffigen build bin ffigen*tar.gz INSTALL-FFIGEN-$(PLATFORM)-gcc-$(GCC_VERSION)*.txt
 
 %.bz2:
 	@echo
