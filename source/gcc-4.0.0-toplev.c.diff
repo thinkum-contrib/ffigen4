@@ -1,0 +1,49 @@
+--- toplev.c.orig	Tue May  3 03:56:20 2005
++++ toplev.c	Tue May  3 03:56:01 2005
+@@ -990,6 +990,8 @@
+   init_cgraph ();
+   init_final (main_input_filename);
+   coverage_init (aux_base_name);
++  if (flag_syntax_only) 
++    ffi_init (asm_out_file, main_input_filename);
+ 
+   timevar_push (TV_PARSE);
+ 
+@@ -1255,9 +1257,12 @@
+ 	   , indent, *indent != 0 ? " " : "",
+ 	   lang_hooks.name, version_string, TARGET_NAME,
+ 	   indent, __VERSION__);
+-  fnotice (file, "%s%sGGC heuristics: --param ggc-min-expand=%d --param ggc-min-heapsize=%d\n",
+-	   indent, *indent != 0 ? " " : "",
+-	   PARAM_VALUE (GGC_MIN_EXPAND), PARAM_VALUE (GGC_MIN_HEAPSIZE));
++  if (flag_syntax_only) 
++    print_ffi_version (file, indent);
++  else
++    fnotice (file, "%s%sGGC heuristics: --param ggc-min-expand=%d --param ggc-min-heapsize=%d\n",
++             indent, *indent != 0 ? " " : "",
++             PARAM_VALUE (GGC_MIN_EXPAND), PARAM_VALUE (GGC_MIN_HEAPSIZE));
+ }
+ 
+ /* Print an option value and return the adjusted position in the line.
+@@ -1998,6 +2003,8 @@
+   input_filename = "<built-in>";
+   input_line = 0;
+ #endif
++  if (flag_syntax_only)
++    ffi_early_init ();
+   if (lang_hooks.init () == 0)
+     return 0;
+   input_location = save_loc;
+@@ -2089,6 +2096,12 @@
+   timevar_start (TV_TOTAL);
+ 
+   process_options ();
++
++  
++  if (no_backend && flag_syntax_only) {
++    errorcount++;
++  }
++
+ 
+   /* Don't do any more if an error has already occurred.  */
+   if (!errorcount)

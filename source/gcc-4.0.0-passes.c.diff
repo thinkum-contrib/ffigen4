@@ -1,0 +1,12 @@
+--- passes.c.orig	Tue May  3 03:54:22 2005
++++ passes.c	Tue May  3 03:54:30 2005
+@@ -255,6 +255,9 @@
+   /* Let cgraph know about the existance of variables.  */
+   if (TREE_CODE (decl) == VAR_DECL && !DECL_EXTERNAL (decl))
+     cgraph_varpool_node (decl);
++
++  if (flag_syntax_only) 
++    ffi_rest_of_decl_compilation (decl, top_level, at_end);
+ }
+ 
+ /* Called after finishing a record, union or enumeral type.  */
