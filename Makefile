@@ -1,7 +1,7 @@
 OS = $(shell uname -s)
 NOW = $(shell date -u "+%F-%H-%M-%S")
 
-GCC_VERSION = 4.0-20050326
+GCC_VERSION = 4.0.0
 ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
 
 ifeq ($(OS),Linux)
