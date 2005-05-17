@@ -58,6 +58,7 @@ package: compile
 	cp -r -p gcc-$(GCC_VERSION)/gcc/ginclude ffigen
 	mv ffigen/ginclude ffigen/include
 	cp -p build/gcc/xlimits.h ffigen/include/limits.h
+	cp -p build/gcc/gsyslimits.h ffigen/include/syslimits.h
 ifeq ($(COPY_OBJC_HEADERS), YES)
 	cp -r -p gcc-$(GCC_VERSION)/libobjc/objc ffigen/include
 endif
