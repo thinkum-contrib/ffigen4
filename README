@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.2  2005/08/10 05:05:46  gb
+# Updated.
+#
 # Revision 1.1  2005/04/08 07:03:16  gb
 # New file.
 #
@@ -33,13 +36,28 @@ and DarwinPPC.
 In order to build the program, it's necessary to obtain canonical
 versions of GCC (with ObjC support) for the target platform; the
 Makefile tersely explains what's missing and suggests where to find
-it.  Until GCC 4.0 is released, it's necessary to obtain snapshot
-archives from gcc.gnu.org or a mirror site and copy them to this
-directory:
+it.  You need to obtain the following files from gcc.gnu.org or a
+mirror site and install them in this directory:
 
-gcc-core-4.0-GCC_VERSION.tar.bz2
-gcc-objc-4.0-GCC_VERSION.tar.bz2
+gcc-core-4.0.0.tar.bz2
+gcc-objc-4.0.0.tar.bz2
 
-See the Makefile for the latest supported GCC_VERSION.
+Once those archives are installed, doing:
+
+shell> make
+
+will build the modified frontend, create an archive containing that
+frontend and related support files, and create a text file explaining
+how to install things.
+
+These patches are maintained in CVS on clozure.com.  For anonymous
+access:
+
+shell> cvs -d :pserver:cvs@clozure.com:/usr/local/publiccvs login
+
+[The anonymous CVS password is 'cvs']
+
+shell> cvs -d :pserver:cvs@clozure.com:/usr/local/publiccvs get ffigen4
+
 
 
