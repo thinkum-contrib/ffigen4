@@ -172,9 +172,9 @@ static ffi_primitive_name_map ffi_primitive_names[] =
   {"__vector unsigned long", "__vector-unsigned-long"},
   {"__vector signed long", "__vector-signed-long"},
   {"__vector bool long", "__vector-bool-long"},
-  {"__vector float", "__vector-short"},
+  {"__vector float", "__vector-short-float"},
   {"__vector pixel", "__vector-pixel"},
-  {"__vector", "__vector"},
+  {"__vector", "__vector"},  
   {"_Bool", "unsigned"},
   {"__int128_t", "long-long-long"}, 
   {"__uint128_t", "unsigned-long-long-long"}, 
@@ -264,6 +264,31 @@ ffi_maybe_synthesize_integer_type (tree type, struct ffi_typeinfo *info)
           info->name = is_unsigned ? "unsigned-long-long-long" : "long-long-long";
           info->status = FFI_TYPE_PRIMITIVE;
           break;
+        }
+    }
+  return info;
+}
+
+static struct ffi_typeinfo *
+ffi_maybe_synthesize_vector_type (tree type, struct ffi_typeinfo *info)
+{
+  if (TREE_CODE (type) == VECTOR_TYPE)
+    {
+      
+      HOST_WIDE_INT nbytes =  int_size_in_bytes (type);
+
+      switch (nbytes) 
+        {
+        case 16:
+          info->name = "vec128";
+          info->status = FFI_TYPE_PRIMITIVE;
+          break;
+        case 8:
+          info->name = "vec64";
+          info->status = FFI_TYPE_PRIMITIVE;
+          break;
+	default:
+	  break;
         }
     }
   return info;
@@ -379,7 +404,11 @@ ffi_create_type_info (tree type)
       info = ffi_create_type_info (type);
       break;
     case INTEGER_TYPE:
-      info = ffi_maybe_synthesize_integer_type (type, info);
+    case VECTOR_TYPE:
+      if (TREE_CODE (type) == INTEGER_TYPE) 
+	info = ffi_maybe_synthesize_integer_type (type, info);
+      else
+	info = ffi_maybe_synthesize_vector_type (type, info);
       if (info->status != FFI_TYPE_UNDEFINED)
         return info;
       /* else fall through */
@@ -767,6 +796,10 @@ ffi_define_builtin_type (tree type)
         name = TYPE_NAME (type);
         if (name)
           ffi_define_type (name, FFI_TYPE_PRIMITIVE);
+	else {
+	  fprintf(stderr, "Unnamed builtin vector type:\n");
+	  debug_tree(type);
+	}
         break;
       case POINTER_TYPE:
       case ARRAY_TYPE:
