@@ -1,15 +1,33 @@
 OS = $(shell uname -s)
+ARCH = $(shell arch)
 NOW = $(shell date -u "+%F-%H-%M-%S")
 
 GCC_VERSION = 4.0.0
 ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
 
 ifeq ($(OS),Linux)
+ifeq ($(ARCH), ppc64)
 PLATFORM = linuxppc
 CONFIGTARGET = ppc64-unknown-linux
 CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch --enable-threads=posix
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
+endif
+ifeq ($(ARCH), ppc)
+PLATFORM = linuxppc
+CONFIGTARGET = ppc64-unknown-linux
+CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch --enable-threads=posix
+MAKE_FUNKY_LINK = YES
+COPY_OBJC_HEADERS = YES
+endif
+ifeq ($(ARCH), x86_64)
+PLATFORM = linuxx8664
+CONFIGTARGET = x86_64-unknown-linux
+CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
+MAKE_FUNKY_LINK = YES
+COPY_OBJC_HEADERS = YES
+endif
+
 endif
 
 ifeq ($(OS),Darwin)
