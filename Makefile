@@ -1,11 +1,11 @@
 OS = $(shell uname -s)
-ARCH = $(shell arch)
 NOW = $(shell date -u "+%F-%H-%M-%S")
 
 GCC_VERSION = 4.0.0
 ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
 
 ifeq ($(OS),Linux)
+ARCH = $(shell arch)
 ifeq ($(ARCH), ppc64)
 PLATFORM = linuxppc
 CONFIGTARGET = ppc64-unknown-linux
@@ -27,10 +27,22 @@ CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=po
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
 endif
-
 endif
 
+ifeq ($(OS),FreeBSD)
+ARCH = $(shell uname -p)
+ifeq ($(ARCH),amd64)
+PLATFORM = freebsdx8664
+CONFIGTARGET = amd64-unknown-freebsd6.0
+CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
+MAKE_FUNKY_LINK = YES
+COPY_OBJC_HEADERS = YES
+endif
+endif
+
+
 ifeq ($(OS),Darwin)
+ARCH = $(shell arch)
 PLATFORM=darwinppc
 CONFIGTARGET = powerpc-apple-darwin8
 CONFIGARGS = --target=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch
@@ -54,12 +66,16 @@ endif
 ifeq ($(OS),Linux)
 	(cd build ; ln -s . build-$(CONFIGTARGET))
 endif
+ifeq ($(OS),FreeBSD)
+	(cd build ; ln -s . build-$(CONFIGTARGET))
 endif
-	(cd build ; make maybe-configure-libiberty maybe-configure-gcc maybe-configure-libcpp)
-	(cd build/libiberty ; make)
-	(cd build/intl ; make)
-	(cd build/libcpp ; make)
-	(cd build/gcc ; make cc1obj xlimits.h)
+
+endif
+	(cd build ; $(MAKE) maybe-configure-libiberty maybe-configure-gcc maybe-configure-libcpp)
+	(cd build/libiberty ; $(MAKE))
+	(cd build/intl ; $(MAKE))
+	(cd build/libcpp ; $(MAKE))
+	(cd build/gcc ; $(MAKE) cc1obj xlimits.h)
 
 patch: extract
 	ln -sf `pwd`/source/ffi.c gcc-$(GCC_VERSION)/gcc
