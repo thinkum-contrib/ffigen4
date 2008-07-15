@@ -1,5 +1,6 @@
 OS = $(shell uname -s)
 NOW = $(shell date -u "+%F-%H-%M-%S")
+TAR = tar
 
 GCC_VERSION = 4.0.0
 ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
@@ -50,6 +51,12 @@ MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = NO
 endif
 
+ifeq ($(OS),SunOS)
+TAR = gtar
+PLATFORM = solarisx86
+MAKE_FUNKY_LINK = YES
+endif
+
 
 
 all: package
@@ -68,6 +75,9 @@ ifeq ($(OS),Linux)
 endif
 ifeq ($(OS),FreeBSD)
 	(cd build ; ln -s . build-$(CONFIGTARGET))
+endif
+ifeq ($(OS),SunOS)
+	(cd build ; ln -s . build-`../gcc-$(GCC_VERSION)/config.guess`)
 endif
 
 endif
@@ -99,7 +109,7 @@ endif
 	mkdir ffigen/bin
 	cp -p build/gcc/cc1obj ffigen/bin/ffigen
 	strip ffigen/bin/ffigen
-	tar cfz ffigen-bin-$(PLATFORM)-gcc-$(GCC_VERSION)-$(NOW).tar.gz bin ffigen
+	$(TAR) cfz ffigen-bin-$(PLATFORM)-gcc-$(GCC_VERSION)-$(NOW).tar.gz bin ffigen
 
 clean:
 	rm -rf gcc-$(GCC_VERSION) ffigen build bin ffigen*tar.gz INSTALL-FFIGEN-$(PLATFORM)-gcc-$(GCC_VERSION)*.txt
@@ -111,5 +121,5 @@ clean:
 	@exit 2
 
 extract: $(ARCHIVES) clean
-	tar fxj gcc-core-$(GCC_VERSION).tar.bz2
-	tar fxj gcc-objc-$(GCC_VERSION).tar.bz2
+	$(TAR) fxj gcc-core-$(GCC_VERSION).tar.bz2
+	$(TAR) fxj gcc-objc-$(GCC_VERSION).tar.bz2
