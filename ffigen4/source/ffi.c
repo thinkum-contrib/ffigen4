@@ -44,6 +44,8 @@ void ffi_rest_of_objc_class_compilation (tree);
 void ffi_rest_of_objc_category_compilation (tree);
 void print_ffi_version(FILE *, char *);
 
+
+
 void
 print_ffi_version(FILE *out, char *indent)
 {
@@ -133,6 +135,8 @@ struct ffi_typeinfo {
 };
 
 struct ffi_typeinfo *ffi_typevec;
+
+static void ffi_emit_type (struct ffi_typeinfo *, tree);
 
 int ffi_typevec_len = 0;
 int next_ffi_type_number = 1;
@@ -309,6 +313,7 @@ ffi_create_type_info (tree type)
 
   if (info->status != FFI_TYPE_UNDEFINED)
     return info;
+
  
   switch (TREE_CODE (type))
     {
@@ -532,18 +537,34 @@ ffi_emit_type_decl (struct ffi_typeinfo *info, tree decl)
 {
   /* struct ffi_typeinfo *target_info; */
   tree target;
+  struct ffi_typeinfo *target_info;
 
   if (TREE_ASM_WRITTEN (decl)) 
     return;
 
+
+  target = DECL_ORIGINAL_TYPE (decl);
+  if (target == NULL)
+    target = TREE_TYPE (decl);
+
   TREE_ASM_WRITTEN (decl) = 1;
+  
+  if (! TYPE_SYMTAB_ADDRESS (target))
+    switch (TREE_CODE (target)) 
+      {
+      case RECORD_TYPE:
+      case UNION_TYPE:
+        target_info = ffi_create_type_info (target);
+        ffi_emit_type (target_info, target);
+        break;
+      default:
+        break;
+      }
+
   fprintf (ffifile, "(type (\"%s\" %d)", info->source_file, info->source_line);
   ffi_indent ();
   fprintf (ffifile, "\"%s\"", info->name);
   ffi_unindent (1);
-  target = DECL_ORIGINAL_TYPE (decl);
-  if (target == NULL)
-    target = TREE_TYPE (decl);
   ffi_indent ();
   emit_ffi_type_reference (target);
   ffi_unindent (1);
@@ -709,6 +730,7 @@ ffi_emit_type (struct ffi_typeinfo *info, tree type)
   char *source_file = (char*) (info->source_file ? info->source_file : "");
   int line_number = info->source_line;
   /* tree field; */
+
 
   switch (info->status)
     {
