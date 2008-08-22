@@ -113,6 +113,7 @@ enum ffi_typestatus {FFI_TYPE_UNDEFINED = 0,
 		     FFI_TYPE_TYPEDEF,
 		     FFI_TYPE_STRUCT,
 		     FFI_TYPE_UNION,
+                     FFI_TYPE_TRANSPARENT_UNION,
 		     FFI_TYPE_ENUM,
 		     FFI_TYPE_POINTER,
 		     FFI_TYPE_FUNCTION,
@@ -395,7 +396,11 @@ ffi_create_type_info (tree type)
 	    break;
 	  }
 
-	info->status = (TREE_CODE (type) == RECORD_TYPE) ? FFI_TYPE_STRUCT : FFI_TYPE_UNION;
+        if (TREE_CODE (type) == RECORD_TYPE) 
+          info->status = FFI_TYPE_STRUCT;
+        else if (TYPE_TRANSPARENT_UNION (type))
+          info->status = FFI_TYPE_TRANSPARENT_UNION;
+        else info->status = FFI_TYPE_UNION;
 
 	for (field = TYPE_FIELDS (type); field; field = TREE_CHAIN (field))
 	  {
@@ -509,6 +514,10 @@ emit_ffi_type_reference (tree target_type)
 
     case FFI_TYPE_UNION:
       fprintf (ffifile, "(union-ref \"%s\")", info->name);
+      break;
+
+    case FFI_TYPE_TRANSPARENT_UNION:
+      fprintf (ffifile, "(transparent-union-ref \"%s\")", info->name);
       break;
 
     case FFI_TYPE_ENUM:
@@ -744,7 +753,11 @@ ffi_emit_type (struct ffi_typeinfo *info, tree type)
       break;
 
     case FFI_TYPE_UNION:
-      fprintf (ffifile, "(union (\"%s\" %d)", source_file, line_number);
+    case FFI_TYPE_TRANSPARENT_UNION:
+      fprintf (ffifile, "(%s (\"%s\" %d)", 
+               info->status == FFI_TYPE_UNION ? "union" : "transparent-union",
+               source_file,
+               line_number);
       ffi_indent ();
       fprintf (ffifile, "\"%s\"", info->name);
       ffi_unindent (1);
