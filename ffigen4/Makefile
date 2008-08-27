@@ -1,6 +1,7 @@
 OS = $(shell uname -s)
 NOW = $(shell date -u "+%F-%H-%M-%S")
 TAR = tar
+EXE =
 
 GCC_VERSION = 4.0.0
 ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
@@ -57,7 +58,15 @@ PLATFORM = solarisx86
 MAKE_FUNKY_LINK = YES
 endif
 
-
+# 32-bit Cygwin, at this point
+ifeq (CYGWIN,$(findstring CYGWIN,$(OS)))
+ARCH = $(shell arch)
+PLATFORM=win32
+CONFIGTARGET=i386-pc-cygwin
+MAKE_FUNKY_LINK = YES
+COPY_OBJC_HEADERS = YES
+EXE = .exe
+endif
 
 all: package
 	m4 -DPLATFORM=$(PLATFORM) -DGCC_VERSION=$(GCC_VERSION)-$(NOW) source/INSTALL-$(PLATFORM).m4 > INSTALL-FFIGEN-$(PLATFORM)-gcc-$(GCC_VERSION)-$(NOW).txt
@@ -79,13 +88,15 @@ endif
 ifeq ($(OS),SunOS)
 	(cd build ; ln -s . build-`../gcc-$(GCC_VERSION)/config.guess`)
 endif
-
+ifeq ($(PLATFORM),win32)
+	(cd build ; ln -s . build-`../gcc-$(GCC_VERSION)/config.guess`)
+endif
 endif
 	(cd build ; $(MAKE) maybe-configure-libiberty maybe-configure-gcc maybe-configure-libcpp)
 	(cd build/libiberty ; $(MAKE))
 	(cd build/intl ; $(MAKE))
 	(cd build/libcpp ; $(MAKE))
-	(cd build/gcc ; $(MAKE) cc1obj xlimits.h)
+	(cd build/gcc ; $(MAKE) cc1obj$(EXE) xlimits.h)
 
 patch: extract
 	ln -sf `pwd`/source/ffi.c gcc-$(GCC_VERSION)/gcc
@@ -107,8 +118,8 @@ ifeq ($(COPY_OBJC_HEADERS), YES)
 	cp -r -p gcc-$(GCC_VERSION)/libobjc/objc ffigen/include
 endif
 	mkdir ffigen/bin
-	cp -p build/gcc/cc1obj ffigen/bin/ffigen
-	strip ffigen/bin/ffigen
+	cp -p build/gcc/cc1obj$(EXE) ffigen/bin/ffigen$(EXE)
+	strip ffigen/bin/ffigen$(EXE)
 	$(TAR) cfz ffigen-bin-$(PLATFORM)-gcc-$(GCC_VERSION)-$(NOW).tar.gz bin ffigen
 
 clean:
