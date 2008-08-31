@@ -832,8 +832,10 @@ ffi_define_builtin_type (tree type)
         if (name)
           ffi_define_type (name, FFI_TYPE_PRIMITIVE);
 	else {
+#if 0
 	  fprintf(stderr, "Unnamed builtin vector type:\n");
 	  debug_tree(type);
+#endif
 	}
         break;
       case POINTER_TYPE:
