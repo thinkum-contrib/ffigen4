@@ -7,7 +7,7 @@ GCC_VERSION = 4.0.0
 ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
 
 ifeq ($(OS),Linux)
-ARCH = $(shell arch)
+ARCH = $(shell uname -m)
 ifeq ($(ARCH), ppc64)
 PLATFORM = linuxppc
 CONFIGTARGET = ppc64-unknown-linux
@@ -25,6 +25,13 @@ endif
 ifeq ($(ARCH), x86_64)
 PLATFORM = linuxx8664
 CONFIGTARGET = x86_64-unknown-linux
+CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
+MAKE_FUNKY_LINK = YES
+COPY_OBJC_HEADERS = YES
+endif
+ifeq ($(ARCH), i686)
+PLATFORM = linuxx8664
+CONFIGTARGET = i686-unknown-linux
 CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
