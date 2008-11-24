@@ -36,10 +36,13 @@ ARCH = $(shell uname -p)
 ifeq ($(ARCH),amd64)
 PLATFORM = freebsdx8664
 CONFIGTARGET = amd64-unknown-freebsd6.0
+else
+PLATFORM = freebsdx86
+CONFIGTARGET = i386-unknown-freebsd6.0
+endif
 CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
-endif
 endif
 
 
