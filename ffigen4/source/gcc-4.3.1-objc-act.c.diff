@@ -1,0 +1,182 @@
+--- objc/objc-act.c.orig	2008-08-07 06:34:53.000000000 -0600
++++ objc/objc-act.c	2009-07-21 21:01:22.000000000 -0600
+@@ -1577,7 +1577,10 @@
+   /* Suppress outputting debug symbols, because
+      dbxout_init hasn'r been called yet.  */
+   write_symbols = NO_DEBUG;
+-  debug_hooks = &do_nothing_debug_hooks;
++  if (!flag_syntax_only) 
++    debug_hooks = &do_nothing_debug_hooks;
++
++
+ 
+ #ifdef OBJCPLUS
+   push_lang_context (lang_name_c); /* extern "C" */
+@@ -9901,7 +9904,7 @@
+     {
+       /* All code generation is done in finish_objc.  */
+ 		   
+-		   objc_gen_property_data (implementation_template, implementation_template);
++      objc_gen_property_data (implementation_template, implementation_template);
+ 
+ 
+       if (implementation_template != objc_implementation_context)
+@@ -9925,7 +9928,7 @@
+ 
+       if (category)
+ 	{
+-		   objc_gen_property_data (implementation_template, category);
++          objc_gen_property_data (implementation_template, category);
+ 	   
+ 	  /* Ensure all method listed in the interface contain bodies.  */
+ 	  check_methods (CLASS_CLS_METHODS (category),
+@@ -9940,7 +9943,7 @@
+ 	}
+     }
+ 		   
+-	else
++  else
+     {
+       tree x;
+       if (TREE_CODE (class) == CLASS_INTERFACE_TYPE)
+@@ -10010,8 +10013,8 @@
+ 		    error ("existing accessor %<%c%s%> cannot have any argument",
+ 			   '-', IDENTIFIER_POINTER (PROPERTY_GETTER_NAME (x)));	
+ 		}
+-	     /* APPLE LOCAL radar 4712415 */
+-	     TREE_DEPRECATED (getter_decl) = TREE_DEPRECATED (x);
++              /* APPLE LOCAL radar 4712415 */
++              TREE_DEPRECATED (getter_decl) = TREE_DEPRECATED (x);
+ 	    }
+ 	  if (PROPERTY_SETTER_NAME (x) == NULL_TREE
+ 	      && PROPERTY_READONLY (x) == boolean_false_node)
+@@ -10019,7 +10022,7 @@
+ 	      /* No setter is specified and it is not a 'readonly' property. Generate an instance
+ 		 or find an existing one. */
+ 	      tree setter_name = get_identifier (objc_build_property_setter_name (
+-				   prop_name, true)); 
++                                                                                  prop_name, true)); 
+ 	      setter_decl = lookup_method (CLASS_NST_METHODS (class), setter_name);
+ 	      if (setter_decl)
+ 		{
+@@ -10036,11 +10039,11 @@
+ 		      tree arg_type = TREE_VALUE (TREE_TYPE (akey));
+ 		      if (comptypes (type, arg_type) != 1)
+ 			error ("setter %<%c%s%> argument type does not match property type",
+-				'-', IDENTIFIER_POINTER (prop_name));
++                               '-', IDENTIFIER_POINTER (prop_name));
+ 		      akey = TREE_CHAIN (akey);
+ 		      if (akey)
+ 			error ("setter %<%c%s%> has too many arguments",
+-				'-', IDENTIFIER_POINTER (prop_name));
++                               '-', IDENTIFIER_POINTER (prop_name));
+ 		    }
+ 	    	  /* APPLE LOCAL radar 4712415 */
+ 	    	  TREE_DEPRECATED (setter_decl) = TREE_DEPRECATED (x);
+@@ -10072,8 +10075,8 @@
+ 							       /* APPLE LOCAL radar 4157812 */
+ 							       arg_type, arg_name, NULL_TREE);
+ 		      setter_decl = build_method_decl (INSTANCE_METHOD_DECL,
+-                                      build_tree_list (NULL_TREE, void_type_node), selector,
+-                                      build_tree_list (NULL_TREE, NULL_TREE), false);
++                                                       build_tree_list (NULL_TREE, void_type_node), selector,
++                                                       build_tree_list (NULL_TREE, NULL_TREE), false);
+ 		      objc_add_method (class, setter_decl, false);
+ 		      METHOD_PROPERTY_CONTEXT (setter_decl) = x;
+ 		      /* Issue error if setter name matches a property name. */
+@@ -10099,30 +10102,30 @@
+ 			       IDENTIFIER_POINTER (PROPERTY_NAME (x)));
+ 		      if (!METHOD_SEL_ARGS (setter_decl))
+ 		    	error ("setter %<%c%s%> has no argument",
+-				'-', IDENTIFIER_POINTER (PROPERTY_SETTER_NAME (x)));
++                               '-', IDENTIFIER_POINTER (PROPERTY_SETTER_NAME (x)));
+ 		      else
+ 		    	{
+ 		          tree akey = METHOD_SEL_ARGS (setter_decl);
+ 			  if (akey)
+-			  {
+-		            tree arg_type = TREE_VALUE (TREE_TYPE (akey));
+-		            if (comptypes (type, arg_type) != 1)
+-			      /* APPLE LOCAL radar 4815054 */
+-			      error ("argument type of setter %<%c%s%> does not match the type of property %qs",
+-				     '-', IDENTIFIER_POINTER (PROPERTY_SETTER_NAME (x)), 
+-				     IDENTIFIER_POINTER (PROPERTY_NAME (x)));
+-		            akey = TREE_CHAIN (akey);
+-			    if (akey)
+-			      error ("specified setter %<%c%s%> has too many arguments",
+-				     '-', IDENTIFIER_POINTER (PROPERTY_SETTER_NAME (x)));
+-			  }
++                            {
++                              tree arg_type = TREE_VALUE (TREE_TYPE (akey));
++                              if (comptypes (type, arg_type) != 1)
++                                /* APPLE LOCAL radar 4815054 */
++                                error ("argument type of setter %<%c%s%> does not match the type of property %qs",
++                                       '-', IDENTIFIER_POINTER (PROPERTY_SETTER_NAME (x)), 
++                                       IDENTIFIER_POINTER (PROPERTY_NAME (x)));
++                              akey = TREE_CHAIN (akey);
++                              if (akey)
++                                error ("specified setter %<%c%s%> has too many arguments",
++                                       '-', IDENTIFIER_POINTER (PROPERTY_SETTER_NAME (x)));
++                            }
+ 			  else
+ 			    error ("specified setter %<%c%s%> has no argument",
+-				     '-', IDENTIFIER_POINTER (PROPERTY_SETTER_NAME (x)));
++                                   '-', IDENTIFIER_POINTER (PROPERTY_SETTER_NAME (x)));
+ 		    	}
+ 		    }
+-	    	    /* APPLE LOCAL radar 4712415 */
+-	    	    TREE_DEPRECATED (setter_decl) = TREE_DEPRECATED (x);
++                  /* APPLE LOCAL radar 4712415 */
++                  TREE_DEPRECATED (setter_decl) = TREE_DEPRECATED (x);
+ 		}	
+ 	    }
+ 	  if (PROPERTY_RETAIN (x) == boolean_true_node)
+@@ -10138,21 +10141,34 @@
+ 		       IDENTIFIER_POINTER (PROPERTY_NAME (x)));
+ 	    }
+ 	}
+-        /* APPLE LOCAL begin radar 4965989 */ 
+-        /* New anonymous category */
+-        if (ANONYMOUS_CATEGORY (class))
+-          {
+-            /* Merge all anonymous category's methods (including setter/getter) into its primary class. */
+-            tree primary = lookup_interface (CLASS_NAME (class));
+-            if (primary)
+-              {
+-                objc_merge_methods (primary, CLASS_NST_METHODS (class), '-');
+-                objc_merge_methods (primary, CLASS_CLS_METHODS (class), '+');
+-              } 
+-          }
+-        /* APPLE LOCAL end radar 4965989 */
++      /* APPLE LOCAL begin radar 4965989 */ 
++      /* New anonymous category */
++      if (ANONYMOUS_CATEGORY (class))
++        {
++          /* Merge all anonymous category's methods (including setter/getter) into its primary class. */
++          tree primary = lookup_interface (CLASS_NAME (class));
++          if (primary)
++            {
++              objc_merge_methods (primary, CLASS_NST_METHODS (class), '-');
++              objc_merge_methods (primary, CLASS_CLS_METHODS (class), '+');
++            } 
++        }
++      /* APPLE LOCAL end radar 4965989 */
+     }
+-}
++  if (flag_syntax_only) {
++    switch (TREE_CODE (class)) {
++    case CLASS_INTERFACE_TYPE:
++      ffi_rest_of_objc_class_compilation (class);
++      break;
++    case CATEGORY_INTERFACE_TYPE:
++      ffi_rest_of_objc_category_compilation (class);
++      break;
++    case PROTOCOL_INTERFACE_TYPE:
++      ffi_rest_of_objc_protocol_compilation (class);
++      break;
++    }
++  }
++ }
+ 
+ static tree
+ add_protocol (tree protocol)
