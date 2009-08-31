@@ -35,7 +35,6 @@ CONFIGARGS= -v --prefix="$(resultFolder)" --target=$(compilerTarget) \
 
 
 all: package
-	m4 -DPLATFORM=$(PLATFORM) -DGCC_VERSION=$(GCC_VERSION)-$(NOW) source/INSTALL-$(PLATFORM).m4 > INSTALL-FFIGEN-$(PLATFORM)-gcc-$(GCC_VERSION)-$(NOW).txt
 
 
 compile: patch
