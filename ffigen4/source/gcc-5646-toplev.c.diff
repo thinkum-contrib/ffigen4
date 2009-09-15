@@ -1,0 +1,38 @@
+--- toplev.c.orig	2009-09-15 07:48:17.000000000 -0600
++++ toplev.c	2009-09-15 07:50:47.000000000 -0600
+@@ -1094,6 +1094,8 @@
+   init_cgraph ();
+   init_final (main_input_filename);
+   coverage_init (aux_base_name);
++  if (flag_syntax_only) 
++    ffi_init (asm_out_file, main_input_filename);
+ 
+   timevar_push (TV_PARSE);
+ 
+@@ -1241,10 +1243,13 @@
+ 	   indent, *indent != 0 ? " " : "",
+ 	   lang_hooks.name, version_string, TARGET_NAME,
+ 	   indent, __VERSION__);
+-  fprintf (file,
+-	   file == stderr ? _(fmt2) : fmt2,
+-	   indent, *indent != 0 ? " " : "",
+-	   PARAM_VALUE (GGC_MIN_EXPAND), PARAM_VALUE (GGC_MIN_HEAPSIZE));
++  if (flag_syntax_only)
++    print_ffi_version (file, indent);
++  else
++    fprintf (file,
++             file == stderr ? _(fmt2) : fmt2,
++             indent, *indent != 0 ? " " : "",
++             PARAM_VALUE (GGC_MIN_EXPAND), PARAM_VALUE (GGC_MIN_HEAPSIZE));
+ }
+ 
+ /* Print an option value and return the adjusted position in the line.
+@@ -2069,6 +2074,8 @@
+ #endif
+   if (lang_hooks.init () == 0)
+     return 0;
++  if (flag_syntax_only)
++    ffi_early_init ();
+   input_location = save_loc;
+ 
+   init_asm_output (name);

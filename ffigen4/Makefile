@@ -3,7 +3,7 @@
 
 NOW = $(shell date -u "+%F-%H-%M-%S")
 
-GCC_VERSION = 5465
+GCC_VERSION = 5646
 ARCH = $(shell arch)
 ifeq ($(ARCH),i386)
 PLATFORM = intel

@@ -1,0 +1,19 @@
+--- Makefile.in.orig	2009-09-15 07:34:11.000000000 -0600
++++ Makefile.in	2009-09-15 07:34:53.000000000 -0600
+@@ -1039,7 +1039,7 @@
+  lambda-trans.o	lambda-code.o tree-loop-linear.o tree-ssa-sink.o 	   \
+  tree-vrp.o tree-stdarg.o tree-cfgcleanup.o tree-ssa-reassoc.o		   \
+  tree-ssa-structalias.o tree-object-size.o 				   \
+- rtl-factoring.o
++ rtl-factoring.o ffi.o
+ # APPLE LOCAL end loops-to-memset
+ 
+ 
+@@ -2315,6 +2315,7 @@
+ xcoffout.o : xcoffout.c $(CONFIG_H) $(SYSTEM_H) coretypes.h $(TM_H) \
+    $(TREE_H) $(RTL_H) xcoffout.h $(FLAGS_H) toplev.h output.h dbxout.h \
+    $(GGC_H) $(TARGET_H) gstab.h xcoff.h
++ffi.o : ffi.c $(CONFIG_H) system.h $(TREE_H) coretypes.h $(TM_H)
+ emit-rtl.o : emit-rtl.c $(CONFIG_H) $(SYSTEM_H) coretypes.h $(TM_H) $(RTL_H) \
+    $(TREE_H) $(FLAGS_H) $(FUNCTION_H) $(REGS_H) insn-config.h $(RECOG_H) \
+    $(GGC_H) $(EXPR_H) hard-reg-set.h bitmap.h toplev.h $(BASIC_BLOCK_H) \

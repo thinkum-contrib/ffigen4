@@ -1,0 +1,35 @@
+--- objc/objc-act.c.orig	2009-09-15 07:41:17.000000000 -0600
++++ objc/objc-act.c	2009-09-15 07:44:55.000000000 -0600
+@@ -972,7 +972,10 @@
+      do not output any debug info. for class type as yet. */
+   gcc_assert (TREE_CODE (objc_interface_context) == CLASS_INTERFACE_TYPE);
+   save_default_debug_hooks = debug_hooks;
+-  debug_hooks = &do_nothing_debug_hooks;
++  if (!flag_syntax_only) 
++    debug_hooks = &do_nothing_debug_hooks;
++
++
+   /* APPLE LOCAL end radar 4666559 */
+   objc_ivar_chain
+     = continue_class (objc_interface_context);
+@@ -16938,6 +16941,20 @@
+           }
+         /* APPLE LOCAL end radar 4965989 */
+     }
++  if (flag_syntax_only) {
++    switch (TREE_CODE (class)) {
++    case CLASS_INTERFACE_TYPE:
++      ffi_rest_of_objc_class_compilation (class);
++      break;
++    case CATEGORY_INTERFACE_TYPE:
++      ffi_rest_of_objc_category_compilation (class);
++      break;
++    case PROTOCOL_INTERFACE_TYPE:
++      ffi_rest_of_objc_protocol_compilation (class);
++      break;
++    }
++  }
++
+   /* APPLE LOCAL end objc new property */
+ }
+ 
