@@ -36,6 +36,12 @@ CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=po
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
 endif
+ifeq ($(ARCH), armv7l)
+PLATFORM = linuxarm
+CONFIGTARGET = armv7l-unknown-linux-gnu
+MAKE_FUNKY_LINK = YES
+COPY_OBJC_HEADERS = YES
+endif
 endif
 
 ifeq ($(OS),FreeBSD)
