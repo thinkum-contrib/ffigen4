@@ -1,5 +1,5 @@
 /* ffi.c - generate .ffi file from .h file
-   Copyright (C) 2001, 2005-2007 Clozure Associates.
+   Copyright (C) 2001, 2005 Clozure Associates.
    Copyright (C) 2004, Helmut Eller
 
 This file is part of GNU CC (or, more accurately, part of a work
@@ -178,6 +178,9 @@ static ffi_primitive_name_map ffi_primitive_names[] =
   {"_Bool", "unsigned"},
   {"__int128_t", "long-long-long"}, 
   {"__uint128_t", "unsigned-long-long-long"}, 
+  {"_Decimal32", "decimal32"},
+  {"_Decimal64", "decimal64"},
+  {"_Decimal128", "decimal128"},
   {NULL, NULL}
 };
 
@@ -315,6 +318,7 @@ ffi_create_type_info (tree type)
 
     case POINTER_TYPE:
     case REFERENCE_TYPE:
+    case BLOCK_POINTER_TYPE:
       {
 	tree pointer_target_type = TREE_TYPE (type);
 	struct ffi_typeinfo *pointer_type_info;
@@ -805,7 +809,9 @@ ffi_define_builtin_type (tree type)
       case REAL_TYPE:
       case COMPLEX_TYPE:
       case VOID_TYPE:
+#if 0
       case CHAR_TYPE:
+#endif
       case BOOLEAN_TYPE:
       case VECTOR_TYPE:
         name = TYPE_NAME (type);
@@ -819,6 +825,7 @@ ffi_define_builtin_type (tree type)
 #endif
         break;
       case POINTER_TYPE:
+      case BLOCK_POINTER_TYPE:
       case ARRAY_TYPE:
         ffi_create_type_info (type);
         break;
@@ -955,7 +962,7 @@ ffi_define_objc_method (const char *method_kind, tree m, tree c, const char *cat
     emit_ffi_type_reference (ffi_objc_method_parm_type (param));
   }
   if (METHOD_ADD_ARGS (m))
-    if (TREE_PUBLIC (METHOD_ADD_ARGS (m)))
+    if (METHOD_ADD_ARGS_ELLIPSIS_P (m))
       {
         if (i) 
           fprintf (ffifile, " ");
@@ -1012,7 +1019,7 @@ void
 ffi_rest_of_objc_protocol_compilation (tree p)
 {
   tree n;
-  char *category_name = NULL;   /* ??? */
+  char *category_name = NULL;
   
   for (n = PROTOCOL_CLS_METHODS (p); n; n = TREE_CHAIN (n))
     ffi_define_objc_method ("objc-protocol-class-method", 

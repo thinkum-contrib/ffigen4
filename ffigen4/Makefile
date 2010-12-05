@@ -23,7 +23,6 @@ ifeq ($(ARCH),i386)
 	      gcc-$(GCC_VERSION)/gcc/config/i386/tmmintrin.h \
 	      gcc-$(GCC_VERSION)/gcc/config/i386/emmintrin.h \
 	      gcc-$(GCC_VERSION)/gcc/config/i386/pmmintrin.h \
-	      gcc-$(GCC_VERSION)/gcc/config/i386/pmm_malloc.h \
 	      gcc-$(GCC_VERSION)/gcc/config/i386/gmm_malloc.h \
 	      gcc-$(GCC_VERSION)/gcc/config/i386/mmintrin.h \
 	      gcc-$(GCC_VERSION)/gcc/config/i386/mm3dnow.h \
@@ -42,10 +41,11 @@ compile: patch
 	mkdir build
 	(cd build; ../gcc-$(GCC_VERSION)/configure --enable-languages=objc)	
 	(cd build; ln -s . build-`../gcc-$(GCC_VERSION)/config.guess`)
-	(cd build ; $(MAKE) maybe-configure-libiberty maybe-configure-gcc maybe-configure-libcpp maybe-configure-fixincludes)
+	(cd build ; $(MAKE) maybe-configure-libiberty maybe-configure-gcc maybe-configure-libcpp maybe-configure-fixincludes maybe-configure-libdecnumber)
 	(cd build/libiberty ; $(MAKE))
 	(cd build/intl ; $(MAKE))
 	(cd build/libcpp ; $(MAKE))
+	(cd build/libdecnumber; $(MAKE))
 	mkdir gcc
 	(cd build/fixincludes ; $(MAKE))
 	(cd build/gcc ; $(MAKE) cc1obj stmp-fixinc xlimits.h)

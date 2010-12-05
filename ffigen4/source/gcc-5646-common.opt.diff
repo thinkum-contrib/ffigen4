@@ -1,14 +1,19 @@
---- common.opt.orig	2009-09-15 07:39:22.000000000 -0600
-+++ common.opt	2009-09-15 07:39:54.000000000 -0600
-@@ -1016,6 +1016,11 @@
- Common Report Var(flag_syntax_only)
- Check for syntax errors, then stop
+--- common.opt.orig	2009-09-15 08:16:15.000000000 -0600
++++ common.opt	2009-09-15 08:19:13.000000000 -0600
+@@ -1012,9 +1012,14 @@
+ Common Report Var(flag_strict_overflow)
+ Treat signed overflow as undefined
  
-+; This is basically just an alias for -fsyntax_only, in practice
+-fsyntax-only
++;fsyntax-only
++;Common Report Var(flag_syntax_only)
++;Check for syntax errors, then stop
++
 +fffigen
-+Common Report Var(flag_syntax_only) VarExists
+ Common Report Var(flag_syntax_only)
+-Check for syntax errors, then stop
 +Generate .ffi output
 +
+ 
  ftest-coverage
  Common Report Var(flag_test_coverage)
- Create data files needed by \"gcov\"
