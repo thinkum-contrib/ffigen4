@@ -1,0 +1,13 @@
+--- passes.c.orig	2010-12-29 03:38:13.258558003 -0700
++++ passes.c	2010-12-29 03:39:04.558204501 -0700
+@@ -187,6 +187,10 @@
+   /* Let cgraph know about the existence of variables.  */
+   if (TREE_CODE (decl) == VAR_DECL && !DECL_EXTERNAL (decl))
+     cgraph_varpool_node (decl);
++
++  if (flag_syntax_only) 
++    ffi_rest_of_decl_compilation (decl, top_level, at_end);
++
+ }
+ 
+ /* Called after finishing a record, union or enumeral type.  */

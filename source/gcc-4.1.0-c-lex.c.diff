@@ -1,0 +1,16 @@
+--- c-lex.c.orig	2010-12-29 03:27:55.058200378 -0700
++++ c-lex.c	2010-12-29 03:29:25.998205880 -0700
+@@ -100,9 +100,10 @@
+   cb->read_pch = c_common_read_pch;
+ 
+   /* Set the debug callbacks if we can use them.  */
+-  if (debug_info_level == DINFO_LEVEL_VERBOSE
+-      && (write_symbols == DWARF2_DEBUG
+-          || write_symbols == VMS_AND_DWARF2_DEBUG))
++  if (flag_syntax_only ||
++      (debug_info_level == DINFO_LEVEL_VERBOSE
++       && (write_symbols == DWARF2_DEBUG
++           || write_symbols == VMS_AND_DWARF2_DEBUG)))
+     {
+       cb->define = cb_define;
+       cb->undef = cb_undef;

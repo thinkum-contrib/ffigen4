@@ -1,0 +1,14 @@
+--- common.opt.orig	2010-12-29 03:46:23.428240506 -0700
++++ common.opt	2010-12-29 03:31:54.218207127 -0700
+@@ -840,6 +840,11 @@
+ Common Report Var(flag_syntax_only)
+ Check for syntax errors, then stop
+ 
++; This is basically just an alias for -fsyntax_only, in practice
++fffigen
++Common Report Var(flag_syntax_only)
++Generate .ffi output
++
+ ftest-coverage
+ Common Report Var(flag_test_coverage)
+ Create data files needed by \"gcov\"

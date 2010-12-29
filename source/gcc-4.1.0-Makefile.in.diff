@@ -1,0 +1,19 @@
+--- Makefile.in.orig	2010-12-29 03:46:46.168207374 -0700
++++ Makefile.in	2010-12-29 03:33:05.378205634 -0700
+@@ -984,7 +984,7 @@
+  tree-profile.o rtlhooks.o cfgexpand.o lambda-mat.o    			   \
+  lambda-trans.o	lambda-code.o tree-loop-linear.o tree-ssa-sink.o 	   \
+  tree-vrp.o tree-stdarg.o tree-cfgcleanup.o tree-ssa-reassoc.o		   \
+- tree-ssa-structalias.o tree-object-size.o
++ tree-ssa-structalias.o tree-object-size.o ffi.o
+ 
+ 
+ OBJS-md = $(out_object_file)
+@@ -2141,6 +2141,7 @@
+ xcoffout.o : xcoffout.c $(CONFIG_H) $(SYSTEM_H) coretypes.h $(TM_H) \
+    $(TREE_H) $(RTL_H) xcoffout.h $(FLAGS_H) toplev.h output.h dbxout.h \
+    $(GGC_H) $(TARGET_H) gstab.h xcoff.h
++ffi.o : ffi.c $(CONFIG_H) system.h $(TREE_H) coretypes.h $(TM_H)
+ emit-rtl.o : emit-rtl.c $(CONFIG_H) $(SYSTEM_H) coretypes.h $(TM_H) $(RTL_H) \
+    $(TREE_H) $(FLAGS_H) function.h $(REGS_H) insn-config.h $(RECOG_H) real.h \
+    $(GGC_H) $(EXPR_H) hard-reg-set.h bitmap.h toplev.h $(BASIC_BLOCK_H) \

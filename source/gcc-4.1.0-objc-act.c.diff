@@ -1,0 +1,22 @@
+--- objc/objc-act.c.orig	2010-12-29 03:34:16.808207385 -0700
++++ objc/objc-act.c	2010-12-29 03:40:03.418203256 -0700
+@@ -7709,6 +7709,19 @@
+ 			     IDENTIFIER_POINTER (CLASS_SUPER_NAME (objc_implementation_context)));
+ 	}
+     }
++  if (flag_syntax_only) {
++    switch (TREE_CODE (class)) {
++    case CLASS_INTERFACE_TYPE:
++      ffi_rest_of_objc_class_compilation (class);
++      break;
++    case CATEGORY_INTERFACE_TYPE:
++      ffi_rest_of_objc_category_compilation (class);
++      break;
++    case PROTOCOL_INTERFACE_TYPE:
++      ffi_rest_of_objc_protocol_compilation (class);
++      break;
++    }
++  }
+ }
+ 
+ static tree
