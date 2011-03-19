@@ -284,6 +284,9 @@ ffi_maybe_synthesize_vector_type (tree type, struct ffi_typeinfo *info)
 
       switch (nbytes) 
         {
+        case 32:
+          info->name = "vec256";
+          info->status = FFI_TYPE_PRIMITIVE;
         case 16:
           info->name = "vec128";
           info->status = FFI_TYPE_PRIMITIVE;
