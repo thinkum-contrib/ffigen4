@@ -115,7 +115,8 @@ endif
 	(cd build/gcc ; $(MAKE) cc1obj$(EXE) xlimits.h)
 
 patch: extract
-	ln -sf `pwd`/source/ffi.c gcc-$(GCC_VERSION)/gcc
+	ln -sf `pwd`/source/ffigen.c gcc-$(GCC_VERSION)/gcc
+	ln -sf `pwd`/source/ffigen.h gcc-$(GCC_VERSION)/gcc
 	printf "char *ffi_version = \42%s\42;\n" "$(NOW)" > gcc-$(GCC_VERSION)/gcc/ffi-version.h
 	for f in source/gcc-$(GCC_VERSION)*.diff ; do \
 	  (cd gcc-$(GCC_VERSION)/gcc; patch -p0 <../../$$f); \
