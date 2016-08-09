@@ -1,6 +1,14 @@
---- objc/objc-act.c.orig	Tue May  3 03:51:48 2005
-+++ objc/objc-act.c	Tue May  3 03:51:24 2005
-@@ -6928,6 +6928,19 @@
+--- objc-act.c.orig	2016-08-09 16:53:21.237367908 -0600
++++ objc-act.c	2016-08-09 17:32:52.818908854 -0600
+@@ -114,6 +114,7 @@
+ /* Set up for use of obstacks.  */
+ 
+ #include "obstack.h"
++#include "ffigen.h"
+ 
+ /* This obstack is used to accumulate the encoding of a data type.  */
+ static struct obstack util_obstack;
+@@ -6928,6 +6929,19 @@
  			     IDENTIFIER_POINTER (CLASS_SUPER_NAME (objc_implementation_context)));
  	}
      }

@@ -1,6 +1,14 @@
---- toplev.c.orig	Tue May  3 03:56:20 2005
-+++ toplev.c	Tue May  3 03:56:01 2005
-@@ -990,6 +990,8 @@
+--- toplev.c.orig	2016-08-09 14:00:23.258974300 -0600
++++ toplev.c	2016-08-09 14:05:06.109130294 -0600
+@@ -99,6 +99,7 @@
+ 				   declarations for e.g. AIX 4.x.  */
+ #endif
+ 
++#include "ffigen.h"
+ static void general_init (const char *);
+ static void do_compile (void);
+ static void process_options (void);
+@@ -990,6 +991,8 @@
    init_cgraph ();
    init_final (main_input_filename);
    coverage_init (aux_base_name);
@@ -9,7 +17,7 @@
  
    timevar_push (TV_PARSE);
  
-@@ -1255,9 +1257,12 @@
+@@ -1255,9 +1258,12 @@
  	   , indent, *indent != 0 ? " " : "",
  	   lang_hooks.name, version_string, TARGET_NAME,
  	   indent, __VERSION__);
@@ -25,7 +33,7 @@
  }
  
  /* Print an option value and return the adjusted position in the line.
-@@ -1998,6 +2003,8 @@
+@@ -1998,6 +2004,8 @@
    input_filename = "<built-in>";
    input_line = 0;
  #endif
@@ -34,16 +42,16 @@
    if (lang_hooks.init () == 0)
      return 0;
    input_location = save_loc;
-@@ -2089,6 +2096,12 @@
-   timevar_start (TV_TOTAL);
+@@ -2090,6 +2098,12 @@
  
    process_options ();
-+
+ 
 +  
 +  if (no_backend && flag_syntax_only) {
 +    errorcount++;
 +  }
 +
- 
++
    /* Don't do any more if an error has already occurred.  */
    if (!errorcount)
+     {
