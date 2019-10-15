@@ -1,5 +1,14 @@
 --- Makefile.in.orig	Tue May  3 03:43:24 2005
-+++ Makefile.in	Tue May  3 03:43:06 2005
++++ Makefile.in
+@@ -141,7 +141,7 @@
+ # TCFLAGS is used for compilations with the GCC just built.
+ XCFLAGS =
+ TCFLAGS =
+-CFLAGS = -g
++CFLAGS += -g
+ STAGE1_CFLAGS = -g @stage1_cflags@
+ STAGE1_CHECKING = -DENABLE_CHECKING -DENABLE_ASSERT_CHECKING
+ BOOT_CFLAGS = -g -O2
 @@ -929,7 +929,7 @@
   varasm.o varray.o vec.o version.o vmsdbgout.o xcoffout.o alloc-pool.o	   \
   et-forest.o cfghooks.o bt-load.o pretty-print.o $(GGC) web.o passes.o	   \

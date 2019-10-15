@@ -3,6 +3,11 @@ NOW = $(shell date -u "+%F-%H-%M-%S")
 TAR = tar
 EXE =
 
+CFLAGS?=-std=c89 -fgnu89-inline
+CFLAGS_FOR_BUILD=${CFLAGS}
+MAKE_ENV+=CFLAGS="${CFLAGS}" CFLAGS_FOR_BUILD="${CFLAGS_FOR_BUILD}"
+CONFIGURE_ENV=${MAKE_ENV}
+
 GCC_VERSION = 4.0.0
 ARCHIVES = gcc-core-$(GCC_VERSION).tar.bz2 gcc-objc-$(GCC_VERSION).tar.bz2
 
@@ -11,28 +16,28 @@ ARCH = $(shell uname -m)
 ifeq ($(ARCH), ppc64)
 PLATFORM = linuxppc
 CONFIGTARGET = ppc64-unknown-linux
-CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch --enable-threads=posix
+CONFIGARGS += --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch --enable-threads=posix
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
 endif
 ifeq ($(ARCH), ppc)
 PLATFORM = linuxppc
 CONFIGTARGET = ppc64-unknown-linux
-CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch --enable-threads=posix
+CONFIGARGS += --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch --enable-threads=posix
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
 endif
 ifeq ($(ARCH), x86_64)
 PLATFORM = linuxx8664
 CONFIGTARGET = x86_64-unknown-linux
-CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
+CONFIGARGS += --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
 endif
 ifeq ($(ARCH), i686)
 PLATFORM = linuxx8664
 CONFIGTARGET = i686-unknown-linux
-CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
+CONFIGARGS += --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
 endif
@@ -45,15 +50,19 @@ endif
 endif
 
 ifeq ($(OS),FreeBSD)
+FBSD_VERSION:=$(shell awk -v version=$$(uname -U) 'END { printf("%d.%d", version / 100000, version / 1000 % 100) }' < /dev/null)
 ARCH = $(shell uname -p)
 ifeq ($(ARCH),amd64)
 PLATFORM = freebsdx8664
-CONFIGTARGET = amd64-unknown-freebsd6.0
+## FIXME - Versioning
+CONFIGTARGET = amd64-unknown-freebsd${FBSD_VERSION}
 else
 PLATFORM = freebsdx86
-CONFIGTARGET = i386-unknown-freebsd6.0
+## FIXME - Versioning
+## see also gcc-4.0.0/gcc/config.gcc
+CONFIGTARGET = i386-unknown-freebsd${FBSD_VERSION}
 endif
-CONFIGARGS = --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
+CONFIGARGS += --target=$(CONFIGTARGET) --host=$(CONFIGTARGET) --enable-threads=posix --enable-biarch
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = YES
 endif
@@ -63,7 +72,7 @@ ifeq ($(OS),Darwin)
 ARCH = $(shell arch)
 PLATFORM=darwinppc
 CONFIGTARGET = powerpc-apple-darwin8
-CONFIGARGS = --target=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch
+CONFIGARGS += --target=$(CONFIGTARGET) --with-cpu=default32 --enable-biarch
 MAKE_FUNKY_LINK = YES
 COPY_OBJC_HEADERS = NO
 endif
@@ -90,7 +99,7 @@ all: package
 
 compile: patch
 	mkdir build
-	(cd build ; ../gcc-$(GCC_VERSION)/configure --enable-languages=objc $(CONFIGARGS) )
+	(cd build ; env ${CONFIGURE_ENV} ../gcc-$(GCC_VERSION)/configure --enable-languages=objc $(CONFIGARGS) )
 ifeq ($(MAKE_FUNKY_LINK),YES)
 ifeq ($(OS),Darwin)
 	(cd build ; ln -s . build-`../gcc-$(GCC_VERSION)/config.guess`)
@@ -108,16 +117,19 @@ ifeq ($(PLATFORM),win32)
 	(cd build ; ln -s . build-`../gcc-$(GCC_VERSION)/config.guess`)
 endif
 endif
-	(cd build ; $(MAKE) maybe-configure-libiberty maybe-configure-gcc maybe-configure-libcpp)
-	(cd build/libiberty ; $(MAKE))
-	(cd build/intl ; $(MAKE))
-	(cd build/libcpp ; $(MAKE))
-	(cd build/gcc ; $(MAKE) cc1obj$(EXE) xlimits.h)
+	(cd build ; env ${MAKE_ENV} $(MAKE) $(MAKEARGS) maybe-configure-libiberty maybe-configure-gcc maybe-configure-libcpp)
+	(cd build/libiberty ; env ${MAKE_ENV} $(MAKE) $(MAKEARGS))
+	(cd build/intl ; env ${MAKE_ENV} $(MAKE) $(MAKEARGS))
+	(cd build/libcpp ; env ${MAKE_ENV} $(MAKE) $(MAKEARGS))
+	(cd build/gcc ; env ${MAKE_ENV} $(MAKE) $(MAKEARGS) cc1obj$(EXE) xlimits.h)
 
 patch: extract
 	ln -sf `pwd`/source/ffigen.c gcc-$(GCC_VERSION)/gcc
 	ln -sf `pwd`/source/ffigen.h gcc-$(GCC_VERSION)/gcc
 	printf "char *ffi_version = \42%s\42;\n" "$(NOW)" > gcc-$(GCC_VERSION)/gcc/ffi-version.h
+	for f in source/gcc-core-$(GCC_VERSION)*.diff ; do \
+	  (cd gcc-$(GCC_VERSION); patch -p0 <../$$f); \
+	done
 	for f in source/gcc-$(GCC_VERSION)*.diff ; do \
 	  (cd gcc-$(GCC_VERSION)/gcc; patch -p0 <../../$$f); \
 	done

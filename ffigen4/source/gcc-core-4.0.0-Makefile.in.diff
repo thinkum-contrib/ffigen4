@@ -1,0 +1,20 @@
+--- Makefile.in.orig	2005-04-21 07:04:10.000000000 +0000
++++ Makefile.in	2019-10-15 03:19:10.763688484 +0000
+@@ -241,7 +241,7 @@
+ # compilers to use to create programs which must be run in the build
+ # environment.
+ CC_FOR_BUILD = @CC_FOR_BUILD@
+-CFLAGS_FOR_BUILD = @CFLAGS_FOR_BUILD@
++CFLAGS_FOR_BUILD += @CFLAGS_FOR_BUILD@
+ 
+ CXX_FOR_BUILD = $(CXX)
+ 
+@@ -324,7 +324,7 @@
+ AR_FLAGS = rc
+ 
+ CC = @CC@
+-CFLAGS = @CFLAGS@
++CFLAGS += @CFLAGS@
+ LIBCFLAGS = $(CFLAGS)
+ 
+ CXX = @CXX@

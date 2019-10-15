@@ -1,0 +1,22 @@
+--- c.opt.orig	2005-04-06 19:35:31.000000000 +0000
++++ c.opt	2019-10-15 02:01:19.476860000 +0000
+@@ -438,10 +438,6 @@
+ C ObjC C++ ObjC++
+ A synonym for -std=c89 (for C) or -std=c++98 (for C++).
+ 
+-d
+-C ObjC C++ ObjC++ Joined
+-; Documented in common.opt.  FIXME - what about -dI, -dD, -dN and -dD?
+-
+ faccess-control
+ C++ ObjC++
+ Enforce class member access control semantics
+@@ -865,8 +861,4 @@
+ C ObjC C++ ObjC++
+ Enable verbose output
+ 
+-w
+-C ObjC C++ ObjC++
+-; Documented in common.opt
+-
+ ; This comment is to ensure we retain the blank line above.
